@@ -2182,27 +2182,69 @@ body {
 
 /*  诗句动画样式  */
 .poetry-message {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    z-index: 9999 !important;
-    pointer-events: none !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-
-    font-family: 'KaiTi', '楷体', 'STKaiti', '华文楷体', 'Times New Roman', serif !important;
-
-    -webkit-touch-callout: none !important;
-    -webkit-tap-highlight-color: transparent !important;
-
-    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        box-shadow 0.6s ease-in-out,
-        filter 0.8s ease-out !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    z-index: 9999;
+    pointer-events: none;
+    user-select: none;
+    background: linear-gradient(135deg, rgba(180, 20, 40, 0.95), rgba(120, 50, 20, 0.95));
+    color: #f5f0e1;
+    padding: 28px 40px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'KaiTi', '楷体', 'STKaiti', serif;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    backdrop-filter: blur(8px);
+    max-width: 85vw;
+    text-align: center;
+    line-height: 1.8;
+    letter-spacing: 3px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    will-change: transform, opacity, filter;
 }
 
+.poetry-message.poetry-animate {
+    animation: poetryReveal 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
+@keyframes poetryReveal {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
+        filter: blur(8px);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: blur(0);
+        box-shadow:
+            0 15px 50px rgba(0, 0, 0, 0.5),
+            0 0 30px rgba(255, 200, 100, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+    75% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1.15);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.4);
+        filter: blur(6px);
+    }
+}
 
 
 /* ==================== 响应式媒体查询 ==================== */

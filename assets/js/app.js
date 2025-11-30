@@ -1111,12 +1111,10 @@ function showTemporaryMessage(message, type = "info") {
  */
 function showPoetryMessage() {
   if (isPoetryAnimationPlaying) {
-    console.log("诗句动画正在播放中，忽略新的触发");
     return;
   }
 
   isPoetryAnimationPlaying = true;
-  console.log("开始播放诗句动画");
 
   if (poetryAnimationTimeout) {
     clearTimeout(poetryAnimationTimeout);
@@ -1132,109 +1130,24 @@ function showPoetryMessage() {
   poetryDiv.className = "poetry-message";
 
   const poetryTexts = i18n.t('poems');
-  const randomPoetry =
-    poetryTexts[Math.floor(Math.random() * poetryTexts.length)];
+  const randomPoetry = poetryTexts[Math.floor(Math.random() * poetryTexts.length)];
   poetryDiv.textContent = randomPoetry;
-
-  Object.assign(poetryDiv.style, {
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%) scale(0.3)",
-    background:
-      "linear-gradient(135deg, rgba(200, 16, 46, 0.95), rgba(139, 69, 19, 0.95))",
-    color: "#f4f1de",
-    padding: "24px 32px",
-    borderRadius: "16px",
-    border: "2px solid rgba(255, 215, 0, 0.6)",
-    zIndex: "9999",
-    fontSize: "18px",
-    fontWeight: "700",
-    fontFamily: "'KaiTi', '楷体', serif",
-    boxShadow:
-      "0 8px 32px rgba(200, 16, 46, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.2)",
-    backdropFilter: "blur(12px)",
-    maxWidth: "80vw",
-    textAlign: "center",
-    lineHeight: "1.6",
-    letterSpacing: "2px",
-    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
-    opacity: "0",
-    pointerEvents: "none",
-    transition: "all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-  });
 
   document.body.appendChild(poetryDiv);
 
   requestAnimationFrame(() => {
-    poetryDiv.style.opacity = "1";
-    poetryDiv.style.transform = "translate(-50%, -50%) scale(1)";
+    requestAnimationFrame(() => {
+      poetryDiv.classList.add("poetry-animate");
+    });
   });
 
-  setTimeout(() => {
-    if (poetryDiv.parentNode && isPoetryAnimationPlaying) {
-      poetryDiv.style.transform = "translate(-50%, -50%) scale(1.1)";
-      poetryDiv.style.fontSize = "20px";
-    }
-  }, 800);
-
-  // 第三阶段：放大到最大并开始淡出
-  setTimeout(() => {
-    if (poetryDiv.parentNode && isPoetryAnimationPlaying) {
-      poetryDiv.style.transform = "translate(-50%, -50%) scale(1.3)";
-      poetryDiv.style.opacity = "0.3";
-      poetryDiv.style.fontSize = "24px";
-      poetryDiv.style.filter = "blur(1px)";
-    }
-  }, 2200);
-
-  // 第四阶段：完全消失
-  setTimeout(() => {
-    if (poetryDiv.parentNode && isPoetryAnimationPlaying) {
-      poetryDiv.style.transform = "translate(-50%, -50%) scale(1.8)";
-      poetryDiv.style.opacity = "0";
-      poetryDiv.style.filter = "blur(3px)";
-
-      setTimeout(() => {
-        if (poetryDiv.parentNode) {
-          poetryDiv.remove();
-        }
-        isPoetryAnimationPlaying = false;
-        console.log("诗句动画播放完成，状态已重置");
-      }, 800);
-    } else if (!isPoetryAnimationPlaying) {
-      if (poetryDiv.parentNode) {
-        poetryDiv.remove();
-      }
-    }
-  }, 3500);
-
-  setTimeout(() => {
-    if (poetryDiv.parentNode && isPoetryAnimationPlaying) {
-      poetryDiv.style.boxShadow =
-        "0 8px 32px rgba(255, 215, 0, 0.8), inset 0 2px 8px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 215, 0, 0.6)";
-    }
-  }, 1000);
-
-  setTimeout(() => {
-    if (poetryDiv.parentNode && isPoetryAnimationPlaying) {
-      poetryDiv.style.boxShadow =
-        "0 8px 32px rgba(200, 16, 46, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.2)";
-    }
-  }, 1800);
-
   poetryAnimationTimeout = setTimeout(() => {
-    if (isPoetryAnimationPlaying) {
-      console.warn("诗句动画超时保护触发，强制重置状态");
-      isPoetryAnimationPlaying = false;
-
-      const remainingPoetry = document.querySelector(".poetry-message");
-      if (remainingPoetry) {
-        remainingPoetry.remove();
-      }
+    if (poetryDiv.parentNode) {
+      poetryDiv.remove();
     }
+    isPoetryAnimationPlaying = false;
     poetryAnimationTimeout = null;
-  }, 5000);
+  }, 4500);
 }
 
 /**
@@ -2680,21 +2593,35 @@ function togglePlay() {
   }
 }
 
-// 递归播放下一个事件
+/**
+ * 递归播放下一个事件
+ */
 function playNextEvent() {
   if (!isPlaying || currentEventIndex >= trajectoryData.events.length - 1) {
-    if (currentEventIndex >= trajectoryData.events.length - 1) {
-      isPlaying = false;
-      const btn = document.getElementById("play-btn");
-      if (btn) {
-        btn.textContent = "▶";
-        btn.title = "播放";
-      }
+    isPlaying = false;
+    const btn = document.getElementById("play-btn");
+    if (btn) {
+      btn.textContent = "▶";
+      btn.title = "播放";
     }
     return;
   }
 
-  showEventAtIndex(currentEventIndex + 1, true);
+  const nextIndex = currentEventIndex + 1;
+  const isLastEvent = nextIndex >= trajectoryData.events.length - 1;
+
+  showEventAtIndex(nextIndex, true);
+
+  if (isLastEvent) {
+    isPlaying = false;
+    const btn = document.getElementById("play-btn");
+    if (btn) {
+      btn.textContent = "▶";
+      btn.title = "播放";
+    }
+    showPoetryMessage();
+    return;
+  }
 
   const waitTime = Math.max(
     currentPlaySpeed,
@@ -2753,15 +2680,9 @@ function handleTimelineKeydown(e) {
       handled = true;
       break;
     case "End":
-      // 检查是否有动画正在播放
-      if (isPoetryAnimationPlaying) {
-        e.preventDefault();
-        return;
-      }
-      // 不跳转，只显示诗句动画
-      e.preventDefault();
-      showPoetryMessage();
-      return;
+      newIndex = trajectoryData.events.length - 1;
+      handled = true;
+      break;
     case " ":
       e.preventDefault();
       togglePlay();
